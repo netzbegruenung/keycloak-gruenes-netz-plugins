@@ -13,7 +13,7 @@ import netzbegruenung.rocketchat.RocketChatClient;
 
 public class RocketChatLoginEventListener implements EventListenerProvider {
 
-    private static final String ROCKETCHAT_CLIENT_ID = "rocketchat";
+    private static final String ROCKETCHAT_CLIENT_ID = "https://chatbegruenung.de/_saml/metadata/gruenesnetz";
 
     private KeycloakSession session;
     private Logger logger;
