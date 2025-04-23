@@ -33,7 +33,6 @@ public class RocketChatLoginEventListener implements EventListenerProvider {
     public void onEvent(Event event) {
         if (event.getType() == EventType.LOGIN) {
             if (event.getClientId().equals(ROCKETCHAT_CLIENT_ID)) {
-                logger.warn("User " + event.getUserId() + "logged in to rocketchat");
                 try {
                     activateUser(event.getUserId());
                 } catch (Throwable e) {
