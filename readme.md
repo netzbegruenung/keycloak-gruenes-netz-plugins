@@ -8,7 +8,7 @@ A Keycloak module with customizations for the Grünes Netz Keycloak instance (ht
 
 This EventListener is triggered when a user logs into Chatbegrünung. It sends a request to the Rocket.Chat API to activate the user.
 This ensures that inactive users can activate their accounts automatically on login and we can safely deactivate their accounts to save on seats.
-Enable the EventListener under: Realm settings" > Events
+Enable the EventListener under: Realm settings > Events
 
 ## Development
 
