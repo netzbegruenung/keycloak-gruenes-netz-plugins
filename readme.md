@@ -10,6 +10,9 @@ This EventListener is triggered when a user logs into Chatbegrünung. It sends a
 This ensures that inactive users can activate their accounts automatically on login and we can safely deactivate their accounts to save on seats.
 Enable the EventListener under: Realm settings > Events
 
+The Rocket.Chat API client requires an admin user with an auth token that doesn't need Two Factor Authentication.
+This can be selected when creating the auth token.
+
 ## Development
 
 ### Requirements
