@@ -78,6 +78,9 @@ public class UpdateUserDto {
     }
 
     public String toJson() {
+        // By default, Gson omits all fields that are null during serialization.
+        // This is important because the Rocket.Chat API does not accept null values
+        // for fields that should not get modified.
         Gson gson = new GsonBuilder()
                 .create();
         return gson.toJson(this);
