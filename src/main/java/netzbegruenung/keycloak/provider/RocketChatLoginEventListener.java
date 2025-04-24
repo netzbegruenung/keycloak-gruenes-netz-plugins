@@ -53,7 +53,7 @@ public class RocketChatLoginEventListener implements EventListenerProvider {
 
         UserInfoDto rcUser = client.getUserInfo(user.getUsername());
 
-        if (rcUser == null) {
+        if (rcUser == null || rcUser.active) {
             return;
         }
 
