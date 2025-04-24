@@ -7,8 +7,13 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import netzbegruenung.rocketchat.dtos.UpdateUserDto;
+import netzbegruenung.rocketchat.dtos.UpdatedUserDto;
+import netzbegruenung.rocketchat.dtos.UserInfoDto;
 
 public class RocketChatClient {
     private final String baseUrl;
@@ -26,12 +31,17 @@ public class RocketChatClient {
                 .build();
     }
 
-    public String findUserIdByUsername(String username) throws IOException, InterruptedException {
+    /**
+     * @param userId The alphanumerical user id or the username.
+     * 
+     * @return UserInfoDto or null if user does not exist
+     */
+    public UserInfoDto getUserInfo(String userId) throws IOException, InterruptedException {
         HttpRequest request = HttpRequest
                 .newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
                 .timeout(Duration.ofSeconds(5))
-                .uri(URI.create(this.baseUrl + "/api/v1/users.info?username=" + username))
+                .uri(URI.create(this.baseUrl + "/api/v1/users.info?username=" + userId))
                 .header("Content-Type", "application/json")
                 .header("X-Auth-Token", this.authToken)
                 .header("X-User-Id", this.userId)
@@ -40,30 +50,39 @@ public class RocketChatClient {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        if (!(response.statusCode() >= 200 && response.statusCode() < 300)) {
+        // try to get the decoded json body to also have it for error handling
+        JsonObject bodyObject = null;
+        try {
+            bodyObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        } catch (Throwable e) {
+            // ignore
+        }
 
+        if (!(response.statusCode() >= 200 && response.statusCode() < 300)) {
             // return null if user does not exist in Rocket.Chat
             if (response.statusCode() == 400) {
-                try {
-                    JsonObject bodyObject = JsonParser.parseString(response.body()).getAsJsonObject();
-                    if (bodyObject.has("success") && !bodyObject.get("success").getAsBoolean() &&
-                        bodyObject.has("error") && "User not found.".equals(bodyObject.get("error").getAsString())) {
-                        return null;
-                    }
-                } catch (Throwable e) {
-                    // ignore
+                if (bodyObject != null && bodyObject.has("error")
+                        && "User not found.".equals(bodyObject.get("error").getAsString())) {
+                    return null;
                 }
             }
             throw new RocketChatClientException("request failed with code: " + response.statusCode());
         }
 
-        JsonObject bodyObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        if (bodyObject == null) {
+            throw new RocketChatClientException("Error parsing response body as JSON: " + response.body());
+        }
+
+        if (!bodyObject.has("success") || !bodyObject.get("success").getAsBoolean()) {
+            throw new RocketChatClientException("Request unsuccessful: " + response.body());
+        }
+
         JsonObject userObject = bodyObject.getAsJsonObject("user");
-        return userObject.get("_id").getAsString();
+        return new Gson().fromJson(userObject, UserInfoDto.class);
     }
 
-    public void activateUser(String userId) throws IOException, InterruptedException {
-        String body = String.format("{\"userId\": \"%s\", \"data\": {\"active\": true}}", userId);
+    public UpdatedUserDto updateUser(UpdateUserDto userData) throws IOException, InterruptedException {
+        String body = userData.toJson();
         HttpRequest request = HttpRequest
                 .newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
@@ -78,8 +97,21 @@ public class RocketChatClient {
         HttpResponse<String> response = this.client.send(request, HttpResponse.BodyHandlers.ofString());
 
         if (!(response.statusCode() >= 200 && response.statusCode() < 300)) {
-            System.out.println(response.body());
             throw new RocketChatClientException("request failed with code: " + response.statusCode());
         }
+
+        JsonObject bodyObject = null;
+        try {
+            bodyObject = JsonParser.parseString(response.body()).getAsJsonObject();
+        } catch (Throwable e) {
+            throw new RocketChatClientException("Error parsing response body as JSON: " + response.body());
+        }
+
+        if (!bodyObject.has("success") || !bodyObject.get("success").getAsBoolean()) {
+            throw new RocketChatClientException("Request unsuccessful: " + response.body());
+        }
+
+        JsonObject userObject = bodyObject.getAsJsonObject("user");
+        return new Gson().fromJson(userObject, UpdatedUserDto.class);
     }
 }

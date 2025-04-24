@@ -10,6 +10,8 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 
 import netzbegruenung.rocketchat.RocketChatClient;
+import netzbegruenung.rocketchat.dtos.UpdateUserDto;
+import netzbegruenung.rocketchat.dtos.UserInfoDto;
 
 public class RocketChatLoginEventListener implements EventListenerProvider {
 
@@ -48,11 +50,17 @@ public class RocketChatLoginEventListener implements EventListenerProvider {
 
     private void activateUser(String userId) throws IOException, InterruptedException {
         UserModel user = getUserModelById(userId);
-        String rocketChatUserId = client.findUserIdByUsername(user.getUsername());
-        if (rocketChatUserId == null) {
+
+        UserInfoDto rcUser = client.getUserInfo(user.getUsername());
+
+        if (rcUser == null) {
             return;
         }
-        client.activateUser(rocketChatUserId);
+
+        UpdateUserDto dto = new UpdateUserDto(rcUser.id);
+        dto.withActive(true);
+
+        client.updateUser(dto);
     }
 
     private UserModel getUserModelById(String userId) {
