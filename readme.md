@@ -17,8 +17,8 @@ This can be selected when creating the auth token.
 
 ### Requirements
 
-- JDK 11 `apt install openjdk-11-jdk`
-- JRE 11 `apt install openjdk-11-jre`
+- JDK 17 `apt install openjdk-17-jdk`
+- JRE 17 `apt install openjdk-17-jre`
 - maven `apt install maven`
 
 ### Build
