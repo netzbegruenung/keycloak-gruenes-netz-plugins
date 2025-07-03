@@ -22,7 +22,7 @@ jobs:
       - name: Prepare staging directory
         run: |
           mkdir staging
-          cp target/*shaded.jar staging/
+          cp target/netzbegruenung.keycloak-gruenes-netz-plugins-v*.jar staging/
 
       - name: Create hash files
         run: |
