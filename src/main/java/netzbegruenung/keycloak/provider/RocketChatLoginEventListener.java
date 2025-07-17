@@ -51,7 +51,7 @@ public class RocketChatLoginEventListener implements EventListenerProvider {
     private void activateUser(String userId) throws IOException, InterruptedException {
         UserModel user = getUserModelById(userId);
 
-        UserInfoDto rcUser = client.getUserInfo(user.getUsername());
+        UserInfoDto rcUser = client.getUserInfo(user.getUsername().toLowerCase());
 
         if (rcUser == null || rcUser.active) {
             return;
