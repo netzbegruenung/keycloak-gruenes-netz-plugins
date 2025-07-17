@@ -36,7 +36,7 @@ public class RocketChatLoginEventListener implements EventListenerProvider {
         if (event.getType() == EventType.LOGIN) {
             if (event.getClientId().equals(ROCKETCHAT_CLIENT_ID)) {
                 try {
-                    activateUser(event.getUserId());
+                    activateUser(event.getUserId().toLowerCase());
                 } catch (Throwable e) {
                     logger.error("Failed to activate user in Rocket.Chat", e);
                 }
