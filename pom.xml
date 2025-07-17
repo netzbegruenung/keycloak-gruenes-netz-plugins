@@ -6,7 +6,7 @@
 
   <groupId>netzbegruenung</groupId>
   <artifactId>keycloak-gruenes-netz-plugins</artifactId>
-  <version>1.0</version>
+  <version>1.0.2</version>
 
   <name>keycloak-gruenes-netz-plugins</name>
   <url>https://github.com/netzbegruenung/keycloak-gruenes-netz-plugins</url>
